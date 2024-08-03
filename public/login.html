@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment for Quadiro Technologies</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Assignment for Quadiro Technologies</h1>
+    </header>
+    <marquee behavior="" direction="">Quadiro Technologies</marquee>
+    <main>
+        <section id="login">
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email"><br><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"><br><br>
+                <button id="login-btn">Login</button>
+                <button id="signup-btn">Sign-up</button>
+            </form>
+        </section>
+        <section id="register" style="display: none;">
+            <h2>Register</h2>
+            <form id="register-form">
+                <label for="email">Email:</label>
+                <input type="email" id="register-email" name="email"><br><br>
+                <label for="password">Password:</label>
+                <input type="password" id="register-password" name="password"><br><br>
+                <button id="register-btn">Register</button>
+            </form>
+        </section>
+        <section id="dashboard" style="display: none;">
+            <h2>Dashboard</h2>
+            <ul id="car-list">
+                <li>Lamborghini</li>
+                <li>Thunderbolt</li>
+                <li>Vortex</li>
+                <li>Phoenix</li>
+                <li>Falcon</li>
+            </ul>
+        </section>
+    </main>
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const dashboard = document.getElementById('dashboard');
+        const carList = document.getElementById('car-list');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Login successful, show dashboard
+                dashboard.style.display = 'block';
+            } else {
+                // Login failed, display error message
+                alert('Invalid email or password');
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Registration successful, redirect to login page
+                window.location.href = '/login';
+            } else {
+                // Registration failed, display error message
+                alert('Email already exists');
+            }
+        });
+
+        // Fetch car list from backend API
+
+        async function fetchCarList() {
+            const response = await fetch('/car');
+            const data = await response.json();
+            const carListHTML = data.cars.map((car) => {
+                return `<li>${car.name} (${car.manufacturingYear}) - ${car.price}</li>`;
+            }).join('');
+            carList.innerHTML = carListHTML;
+        }
+
+        // Display dashboard on page load
+        if (window.location.pathname === '/dashboard.js') {
+            fetchCarList();
+        }
+
+        // Add event listener to login button
+        document.getElementById('login-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.submit();
+            dashboard.style.display = 'block'; // Show dashboard when login button is clicked
+        });
+
+        // Add event listener to register button
+        document.getElementById('register-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.submit();
+        });
+
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const dashboardElement = document.getElementById('dashboard');
+        const registerEmail = document.getElementById('register-email');
+        const registerPassword = document.getElementById('register-password');
+        const loginEmail = document.getElementById('email');
+        const loginPassword = document.getElementById('password');
+        const registerSection = document.getElementById('register');
+
+        signupBtn.addEventListener('click', () => {
+            registerSection.style.display = 'block';
+        });
+
+        registerBtn.addEventListener('click', () => {
+            localStorage.setItem('email', registerEmail.value);
+            localStorage.setItem('password', registerPassword.value);
+        });
+
+        loginBtn.addEventListener('click', () => {
+            const storedEmail = localStorage.getItem('email');
+            const storedPassword = localStorage.getItem('password');
+            if (loginEmail.value === storedEmail && loginPassword.value === storedPassword) {
+                dashboardElement.style.display = 'block';
+            } else {
+                alert('Invalid email or password');
+            }
+        });
+
+        const loginSection = document.getElementById('login');
+
+        signupBtn.addEventListener('click', () => {
+            loginSection.style.display = 'none';
+        });
+
+    </script>
+</body></body>
+
+</html>

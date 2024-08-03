@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <ul id="car-list"></ul>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    fetch('/cars', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const carList = document.getElementById('car-list');
+        data.forEach(car => {
+          const li = document.createElement('li');
+          li.textContent = `${car.carName} (${car.manufacturingYear}) - $${car.price}`;
+          carList.appendChild(li);
+        });
+      })
+      .catch(error => console.error(error));
+  </script>
+</body>
+</html>

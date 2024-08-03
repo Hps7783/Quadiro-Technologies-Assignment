@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Car Details</title>
+</head>
+<body>
+  <h1>Car Details</h1>
+  <p id="car-name"></p>
+  <p id="manufacturing-year"></p>
+  <p id="price"></p>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    const carId = window.location.href.split('/').pop();
+    fetch(`/cars/${carId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('car-name').textContent = data.carName;
+        document.getElementById('manufacturing-year').textContent = data.manufacturingYear;
+        document.getElementById('price').textContent = data.price;
+      })
+      .catch(error => console.error(error));
+  </script>
+</body>
+</html>

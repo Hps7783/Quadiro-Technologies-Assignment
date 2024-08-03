@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Car</title>
+</head>
+<body>
+  <h1>Update Car</h1>
+  <form id="update-car-form">
+    <label for="car-name">Car Name:</label>
+    <input type="text" id="car-name" name="carName"><br><br>
+    <label for="manufacturing-year">Manufacturing Year:</label>
+    <input type="number" id="manufacturing-year" name="manufacturingYear"><br><br>
+    <label for="price">Price:</label>
+    <input type="number" id="price" name="price"><br><br>
+    <button type="submit">Update Car</button>
+  </form>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+  
+    const carId = window.location.href.split('/').pop();
+    fetch(`/cars/${carId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('car-name').value = data.carName;
+        document.getElementById('manufacturing-year').value = data.manufacturingYear;
+        document.getElementById('price').value = data.price;
+      })
+      .catch(error => console.error(error));
+  
+    const form = document.getElementById('update-car-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const carName = document.getElementById('car-name').value;
+      const manufacturingYear = document.getElementById('manufacturing-year').value;
+      const price = document.getElementById('price').value;
+      const response = await fetch(`/cars/${carId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ carName, manufacturingYear, price })
+      });
+      const data = await response.json();
+      if (data.message) {
+        alert(data.message);
+      } else {
+        window.location.href = '/carList';
+      }
+    });
+  </script>
+  </body>
+  </html>
